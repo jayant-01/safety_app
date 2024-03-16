@@ -1,12 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:safety_app/Presentation/components/app_bar.dart';
-import 'package:safety_app/Presentation/components/primary_btn.dart';
-
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
@@ -17,53 +11,82 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: buildAppBar(appBarTitle: title),
       body: Center(
-        child: PrimaryBtn(
-          btnFun: () => _getFromGallery(context),
-          btnText: 'Pick Image',
+        child: Column(
+          children: [
+            ListTile(
+              leading: const CircleAvatar(
+                child: Icon(Icons.mic),
+              ),
+              onTap: () async {
+                PermissionStatus microphoneStatus =
+                    await Permission.microphone.request();
+
+                if (microphoneStatus == PermissionStatus.granted) {}
+                if (microphoneStatus == PermissionStatus.denied) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("this permission is recommened")));
+                }
+                if (microphoneStatus == PermissionStatus.permanentlyDenied) {
+                  openAppSettings();
+                }
+              },
+              title: const Text("mic permission"),
+              subtitle: Text("status of permission: "),
+            ),
+
+            ListTile(
+              leading: const CircleAvatar(
+                child: Icon(Icons.camera),
+              ),
+              onTap: () async {
+                PermissionStatus cameraStatus =
+                    await Permission.camera.request();
+
+                if (cameraStatus == PermissionStatus.granted) {}
+                if (cameraStatus == PermissionStatus.denied) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("this permission is recommened")));
+                }
+                if (cameraStatus == PermissionStatus.permanentlyDenied) {
+                  openAppSettings();
+                }
+              },
+              title: const Text("camera permission"),
+              subtitle: Text("status of permission : "),
+            ),
+
+            ListTile(
+              leading: const CircleAvatar(
+                child: Icon(Icons.folder),
+              ),
+              title: const Text("folder permission"),
+              subtitle: Text("status of permission: "),
+              onTap: () async {
+                PermissionStatus storageStatus =
+                    await Permission.storage.request();
+
+                if (storageStatus == PermissionStatus.granted) {}
+                if (storageStatus == PermissionStatus.denied) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("this permission is recommened")));
+                }
+                if (storageStatus == PermissionStatus.permanentlyDenied) {
+                  openAppSettings();
+                }
+              },
+            ),
+
+            // new buttons to be  added here.....
+          ],
         ),
       ),
     );
   }
 }
 
-/// Get from gallery
-_getFromGallery(context) async {
-  try {
-    XFile? pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1800,
-      maxHeight: 1800,
-    );
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-    }
-  } catch (e) {
-    var status = await Permission.photos.status;
-    if (status.isDenied) {
-      print('Access Denied');
-      showAlertDialog(context);
-    } else {
-      print('Exception occured!');
-    }
-  }
-}
 
-showAlertDialog(context) => showCupertinoDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: const Text('Permission Denied'),
-        content: const Text('Allow access to gallery and photos'),
-        actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () => openAppSettings(),
-            child: const Text('Settings'),
-          ),
-        ],
-      ),
-    );
+
+/// Get from gallery
+
+
+
